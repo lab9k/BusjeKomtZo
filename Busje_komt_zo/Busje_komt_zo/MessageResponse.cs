@@ -21,8 +21,8 @@ namespace Busje_komt_zo
         public class Last
         {
             public int time { get; set; }
-            public string lat { get; set; }
-            public string lon { get; set; }
+            public double lat { get; set; }
+            public double lon { get; set; }
         }
 
         public class Msgs

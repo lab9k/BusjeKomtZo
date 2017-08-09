@@ -17,13 +17,16 @@ namespace Busje_komt_zo
         private string Sid;
         private static readonly string FilePath = "SID.txt";
 
+        public LocationTracker Tracker { get; set; }
+
         public LocationGetter()
         {
             SGetter = new SidFetcher();
+            Tracker = new LocationTracker();;
             ReadSid();
         }
 
-        public MessageResponse GetJsonResult()
+        public BusCoordinates GetJsonResult()
         {
             int now = (int)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
             int from = (int)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 2))).TotalSeconds; //yesterday
@@ -31,21 +34,27 @@ namespace Busje_komt_zo
             {
                 UpdateSid();
             }
-            string json =  GetLocationMessage(Sid, from, now).Result;
-            Console.WriteLine(json);
             try
             {
+                string json =  GetLocationMessage(Sid, from, now).Result;
+            Console.WriteLine(json);
+            
                 if (!json.Contains("error"))
                 {
-                    return JsonConvert.DeserializeObject<MessageResponse>(json);
+                    BusCoordinates coords = new BusCoordinates(JsonConvert.DeserializeObject<MessageResponse>(json));
+                    Tracker.Add(coords);
+                    return coords ;
                 }
             }
             catch (Exception e)
             {
-                //Do Something??
+                //retry
+                UpdateSid();
+                return GetJsonResult();
             }
             UpdateSid();
             return GetJsonResult();
+
         }
 
         private void ReadSid()

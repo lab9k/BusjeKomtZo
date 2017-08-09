@@ -1,4 +1,4 @@
-﻿@model Busje_komt_zo.MessageResponse.Last
+﻿@model Busje_komt_zo.BusCoordinates
 
 @{
     ViewData["Title"] = "Home Page";
@@ -16,31 +16,58 @@
 
 }
 
-<p>lat: @Model.lat, lon: @Model.lon</p>
+<h1>@ViewData["message"]</h1>
+@{
+    if (@Model != null)
+    {
+        <div id="mapid" style="height: 500px;"></div>
 
-<div id="mapid" style="height: 500px;"></div>
-
-<script>
-    var mymap = L.map('mapid').setView([@Model.lat, @Model.lon], 13);
+        <script>
+            var mymap = L.map('mapid').setView([@Model.Latitude.ToString().Replace(',','.'), @Model.Longitude.ToString().Replace(',', '.')], 13);
 
 
-    var myIcon = L.icon({
-        iconUrl: 'https://cdn2.iconfinder.com/data/icons/picons-basic-3/57/basic3-021_delivery_van-512.png',
-        iconSize: [50, 59],
-        iconAnchor: [22, 94],
-        popupAnchor: [-3, -76]
-    });
+            var myIcon = L.icon({
+                iconUrl: 'https://cdn2.iconfinder.com/data/icons/picons-basic-3/57/basic3-021_delivery_van-512.png',
+                iconSize: [50, 59],
+                iconAnchor: [22, 94],
+                popupAnchor: [-3, -76]
+            });
 
-    var currentPos = L.marker([@Model.lat, @Model.lon], { icon: myIcon }).addTo(mymap);
-    var weba = L.marker([51.07421875, 3.74382209778]).addTo(mymap);
-    var jacob = L.marker([51.0565109253, 3.72703361511]).addTo(mymap);
-    weba.bindPopup("<b>P+R Weba/Decathlon</br>").openPopup();
-    jacob.bindPopup("<b>Sint-Jacobs</br>").openPopup();
+            var currentPos = L.marker([@Model.Latitude.ToString().Replace(',', '.'), @Model.Longitude.ToString().Replace(',', '.')]).addTo(mymap);
+            var weba = L.circle([51.07421875, 3.74382209778], {
+                color: 'red',
+                fillColor: '#f03',
+                fillOpacity: 0.5,
+                radius: 250
+            }).addTo(mymap);
+            var jacob = L.circle([51.0565109253, 3.72703361511], {
+                color: 'red',
+                fillColor: '#f03',
+                fillOpacity: 0.5,
+                radius: 250
+            }).addTo(mymap);
+            weba.bindPopup("<b>@ViewData["weba"]</b>");
+            jacob.bindPopup("<b>@ViewData["jacob"]</b>");
 
-    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
-        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-        maxZoom: 25,
-        id: 'mapbox.streets',
-        accessToken: 'pk.eyJ1IjoicnZlcnZ1c3QiLCJhIjoiY2o2M2UwM2p5MWQ0ODMzcG9qcnlndWxjaCJ9.QkVicGhXCReO7kV9KSfqrA'
-    }).addTo(mymap);
-</script>
+            if (@ViewData["id"] == 1) {
+                weba.openPopup();
+            } else if(@ViewData["id"] == 2) {
+                jacob.openPopup();
+            }
+
+            L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+                attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+                maxZoom: 25,
+                id: 'mapbox.streets',
+                accessToken: 'pk.eyJ1IjoicnZlcnZ1c3QiLCJhIjoiY2o2M2UwM2p5MWQ0ODMzcG9qcnlndWxjaCJ9.QkVicGhXCReO7kV9KSfqrA'
+            }).addTo(mymap);
+        </script>
+    }
+    else
+    {
+        <p>Er is geen actief busje gevonden.</p>
+    }
+}
+
+
+

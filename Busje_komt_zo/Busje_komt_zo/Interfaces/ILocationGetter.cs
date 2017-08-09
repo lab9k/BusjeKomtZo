@@ -7,6 +7,7 @@ namespace Busje_komt_zo.Interfaces
 {
     public interface ILocationGetter
     {
-        MessageResponse GetJsonResult();
+        LocationTracker Tracker { get; set; }
+        BusCoordinates GetJsonResult();
     }
 }
