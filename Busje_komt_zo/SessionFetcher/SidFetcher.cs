@@ -42,7 +42,7 @@ namespace SessionFetcher
             return SID;
         }
 
-        public String GetItemFromLocalStorage(IJavaScriptExecutor js, String key)
+        private String GetItemFromLocalStorage(IJavaScriptExecutor js, String key)
         {
             return (String)js.ExecuteScript($"return window.sessionStorage.getItem('{key}');");
         }

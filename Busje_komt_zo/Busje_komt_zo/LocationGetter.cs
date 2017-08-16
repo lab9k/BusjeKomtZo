@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Busje_komt_zo.Classes.Manager;
 using Busje_komt_zo.Interfaces;
 using Newtonsoft.Json;
 using SessionFetcher;
@@ -13,15 +14,15 @@ namespace Busje_komt_zo
 {
     public class LocationGetter : ILocationGetter
     {
-        private ISessionGetter SGetter;
+        private SessionManager SGetter;
         private string Sid;
-        private static readonly string FilePath = "SID.txt";
+        private const string FilePath = "SID.txt";
 
         public LocationTracker Tracker { get; set; }
 
         public LocationGetter()
         {
-            SGetter = new SidFetcher();
+            SGetter = new SessionManager();
             Tracker = new LocationTracker();;
             ReadSid();
         }
@@ -65,7 +66,7 @@ namespace Busje_komt_zo
 
         private void UpdateSid()
         {
-            Sid = SGetter.GetSid();
+            Sid = SGetter.Sid;
             System.IO.File.WriteAllText(FilePath, Sid);
         }
 
