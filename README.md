@@ -16,3 +16,4 @@ Currently the application initiates a headless Chrome session and fetches a sess
 
  - Replace SessionFetcher with a proper API implementation
  - Calculate how long it will take till the next bus arrives
+ - Move hardcoded data to config files
