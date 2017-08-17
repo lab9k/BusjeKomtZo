@@ -25,7 +25,26 @@ namespace Busje_komt_zo
             }
         }
 
+        protected bool Equals(BusCoordinates other)
+        {
+            return Latitude.Equals(other.Latitude) && Longitude.Equals(other.Longitude);
+        }
 
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((BusCoordinates) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (Latitude.GetHashCode() * 397) ^ Longitude.GetHashCode();
+            }
+        }
     }
 
     public class MovementComparer : IComparer<BusCoordinates>

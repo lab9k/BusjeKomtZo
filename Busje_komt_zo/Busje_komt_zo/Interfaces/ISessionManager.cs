@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 
 namespace Busje_komt_zo.Interfaces
 {
-    public interface ILocationGetter
+    interface ISessionManager
     {
-        BusCoordinates GetLocation(int busId);
+
+       string Sid { get;  }
     }
 }

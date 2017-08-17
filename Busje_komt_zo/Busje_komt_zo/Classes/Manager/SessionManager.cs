@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Busje_komt_zo.Interfaces;
 using SessionFetcher;
 
 namespace Busje_komt_zo.Classes.Manager
@@ -12,11 +13,12 @@ namespace Busje_komt_zo.Classes.Manager
     /// <summary>
     /// Fetches SID from server and continiously checks if SID is still valid
     /// </summary>
-    public class SessionManager
+    public class SessionManager : ISessionManager
     {
         private const string _filePath = "SID.txt";
         private Timer _timer;
         private SidFetcher _fetcher;
+        private bool IsUpdating = false;
 
         public string Sid { get; private set; }
 
@@ -34,11 +36,18 @@ namespace Busje_komt_zo.Classes.Manager
             {
                 if (Sid != null && TestSid(Sid).Result)
                 {
-                    //Sid is still valid
+                    Console.WriteLine("Sid is still valid");
+                }
+                else if (IsUpdating)
+                {
+                    Console.WriteLine("Busy updating Sid");
                 }
                 else
                 {
+                    Console.WriteLine($"Sid: {Sid} is no longer valid");
+                    IsUpdating = true;
                     Sid = UpdateSid(_filePath);
+                    IsUpdating = false;
                     continue;
                 }
                 break;
@@ -65,17 +74,19 @@ namespace Busje_komt_zo.Classes.Manager
                 var nvc = new List<KeyValuePair<string, string>>();
                 nvc.Add(new KeyValuePair<string, string>("sid", sid));
 
-                var req = new HttpRequestMessage(HttpMethod.Post, $"https://hst-api.wialon.com/avl_evts")
+                var req = new HttpRequestMessage(HttpMethod.Post, @"https://hst-api.wialon.com/avl_evts")
                 {
                     Content = new FormUrlEncodedContent(nvc)
                 };
                 var client = new HttpClient();
-                client.Timeout = new TimeSpan(2000);
                 HttpResponseMessage res = await client.SendAsync(req);
-                return res.IsSuccessStatusCode;
+                string result = res.Content.ReadAsStringAsync().Result;
+                Console.WriteLine($"Checking sid: {result}");
+                return !result.Contains("error");
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex);
                 return false;
             }
         }
