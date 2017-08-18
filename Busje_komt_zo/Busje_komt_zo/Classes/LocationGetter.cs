@@ -6,7 +6,9 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Busje_komt_zo.Classes.Manager;
+using Busje_komt_zo.Classes.Model;
 using Busje_komt_zo.Interfaces;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SessionFetcher;
 
@@ -15,10 +17,13 @@ namespace Busje_komt_zo
     public class LocationGetter : ILocationGetter
     {
         private readonly SessionManager _sGetter;
+        private readonly AppConfiguration config;
 
-        public LocationGetter()
+        public LocationGetter(IOptions<AppConfiguration> config)
         {
-            _sGetter = new SessionManager();
+            this.config = config.Value;
+            _sGetter = new SessionManager(this.config);
+            
         }
 
         public BusCoordinates GetLocation(int busId)
@@ -36,8 +41,15 @@ namespace Busje_komt_zo
             return null;
 
         }
-        
-        private static async Task<string> GetLocationMessage(string sid,int from, int to, int busId)
+        /// <summary>
+        /// TODO: Change to proper API Call
+        /// </summary>
+        /// <param name="sid"></param>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <param name="busId"></param>
+        /// <returns></returns>
+        private async Task<string> GetLocationMessage(string sid,int from, int to, int busId)
         {
 
             var nvc = new List<KeyValuePair<string, string>>
@@ -47,7 +59,7 @@ namespace Busje_komt_zo
                     $"{{\"layerName\":\"messages\",\"itemId\":{busId},\"timeFrom\":{from},\"timeTo\":{to},\"tripDetector\":0,\"flags\":0,\"trackWidth\":4,\"trackColor\":\"cc0000ff\",\"annotations\":0,\"points\":1,\"pointColor\":\"cc0000ff\",\"arrows\":1}}")
             };
 
-            var req = new HttpRequestMessage(HttpMethod.Post, $"https://hst-api.wialon.com/wialon/ajax.html?svc=render/create_messages_layer&sid={sid}") { Content = new FormUrlEncodedContent(nvc) };
+            var req = new HttpRequestMessage(HttpMethod.Post, string.Format(config.Api.Locations,sid)) { Content = new FormUrlEncodedContent(nvc) };
             var client = new HttpClient();
             HttpResponseMessage res = await client.SendAsync(req);
             return res.Content.ReadAsStringAsync().Result;

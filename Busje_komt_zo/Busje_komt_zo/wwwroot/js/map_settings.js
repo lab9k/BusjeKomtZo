@@ -5,9 +5,9 @@ var mymap = L.map("mapid").setView([51.07421875, 3.74382209778], 13);
 
 
 var myIcon = L.icon({
-    iconUrl: "https://cdn2.iconfinder.com/data/icons/picons-basic-3/57/basic3-021_delivery_van-512.png",
-    iconSize: [50, 59],
-    iconAnchor: [22, 94],
+    iconUrl: "https://d30y9cdsu7xlg0.cloudfront.net/png/7892-200.png",
+    iconSize: [30, 30],
+    iconAnchor: [15, 30],
     popupAnchor: [-3, -76]
 });
 
@@ -57,15 +57,21 @@ function updateMarkers(busses) {
                 .text("BusNr"))
             .append($('<th>')
                 .text("Status"))
+            .append($('<th>')
+                .text("Min"))
         );
 
     $.each(busses,
         function (i, item) {
             if (busMarkers.length < busses.length) {
-                busMarkers.push(L.marker([item.position.latitude, item.position.longitude]).addTo(mymap));
+                busMarkers.push(L.marker([item.position.latitude, item.position.longitude], { icon: myIcon}).addTo(mymap));
             } else {
                 var newLatLng = new L.LatLng(item.position.latitude, item.position.longitude);
                 busMarkers[i].setLatLng(newLatLng);
+            }
+
+            if (item.minutesTillArrival === -1) {
+                item.minutesTillArrival = "==>"
             }
 
             $("#statusTable").find('tbody')
@@ -75,6 +81,8 @@ function updateMarkers(busses) {
                         )
                     .append($('<td>')
                             .text(item.message)
+                    ).append($('<td>')
+                        .text(item.minutesTillArrival)
                     )
                 );
 

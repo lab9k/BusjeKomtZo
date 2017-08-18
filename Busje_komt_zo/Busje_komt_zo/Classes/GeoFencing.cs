@@ -1,36 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Busje_komt_zo.Classes.Model;
+using Busje_komt_zo.Interfaces;
+using Microsoft.Extensions.Options;
 
 namespace Busje_komt_zo
 {
-    public class GeoFencing
+    public class GeoFencing : IGeoFence
     {
-        private const double Dlat = 0.03118975;
-        private const double Dlon = 0.03118975;
-        private const double Reflat = 51.07421875;
-        private const double Reflon = 3.74382209778;
 
-        private const double Tolerance = 0.005;
+        private readonly AppConfiguration _config;
 
-        public static bool IsInRange(double lat, double lon)
+        public GeoFencing(IOptions<AppConfiguration> config)
         {
-            Console.WriteLine($"{lat}   {lon}");
-            Console.WriteLine($"{Reflat - lat}   {Reflon - lon}");
-            return Math.Abs(Reflat - lat) < Dlat && Math.Abs(Reflon - lon) < Dlon;
+            _config = config.Value;
         }
 
-        public static bool IsAtWeba(double lat, double lon)
+        public bool IsInRange(double lat, double lon)
         {
-            return Math.Abs(BusCoordinates.Weba_Lat - lat) < Tolerance &&
-                   Math.Abs(BusCoordinates.Weba_Lon - lon) < Tolerance;
+            return Math.Abs(double.Parse(_config.GeoFencing.CentreLocation[0], CultureInfo.InvariantCulture) - lat) < double.Parse(_config.GeoFencing.ActiveTolerance, CultureInfo.InvariantCulture) && Math.Abs(double.Parse(_config.GeoFencing.CentreLocation[1], CultureInfo.InvariantCulture) - lon) < double.Parse(_config.GeoFencing.ActiveTolerance, CultureInfo.InvariantCulture);
         }
 
-        public static bool IsAtJacobs(double lat, double lon)
+        public bool IsAtWeba(double lat, double lon)
         {
-            return Math.Abs(BusCoordinates.Jacob_Lat - lat) < Tolerance &&
-                   Math.Abs(BusCoordinates.Jacob_Lon - lon) < Tolerance;
+            return Math.Abs(double.Parse(_config.GeoFencing.PRLocation[0], CultureInfo.InvariantCulture) - lat) < double.Parse(_config.GeoFencing.StopTolerance, CultureInfo.InvariantCulture) &&
+                   Math.Abs(double.Parse(_config.GeoFencing.PRLocation[1], CultureInfo.InvariantCulture) - lon) < double.Parse(_config.GeoFencing.StopTolerance, CultureInfo.InvariantCulture);
+        }
+
+        public bool IsAtJacobs(double lat, double lon)
+        {
+            return Math.Abs(double.Parse(_config.GeoFencing.CentreLocation[0], CultureInfo.InvariantCulture) - lat) < double.Parse(_config.GeoFencing.StopTolerance, CultureInfo.InvariantCulture) &&
+                   Math.Abs(double.Parse(_config.GeoFencing.CentreLocation[1], CultureInfo.InvariantCulture) - lon) < double.Parse(_config.GeoFencing.StopTolerance, CultureInfo.InvariantCulture);
         }
     }
 }

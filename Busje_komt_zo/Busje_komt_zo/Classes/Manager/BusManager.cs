@@ -6,28 +6,32 @@ using System.Threading;
 using System.Threading.Tasks;
 using Busje_komt_zo.Classes.Model;
 using Busje_komt_zo.Interfaces;
+using Microsoft.Extensions.Options;
 
 namespace Busje_komt_zo.Classes.Manager
 {
     public class BusManager : IBusManager
     {
 
-        private static readonly int[] BusIds = { 15698388, 15698393, 15698364 };
         private readonly ILocationGetter _locationGetter;
         private Timer _timer;
+        private readonly AppConfiguration _config;
+        private readonly PredictionManager _predictionManager;
 
         public List<Bus> Busses { get; private set; }
 
-        public BusManager(ILocationGetter locationGetter)
+        public BusManager(ILocationGetter locationGetter, IOptions<AppConfiguration> config, IGeoFence geoFence)
         {
+            _predictionManager = new PredictionManager();
+            _config = config.Value;
             _locationGetter = locationGetter;
             Busses = new List<Bus>();
-            foreach (var id in BusIds)
+            foreach (var id in _config.BusIds)
             {
-                Busses.Add(new Bus{Id = id});
+                Busses.Add(new Bus(_config.BusStatusMsgs,id, geoFence,_predictionManager));
             }
 
-            _timer = new Timer(UpdateBusses, null,1000,10 * 1000);
+            _timer = new Timer(UpdateBusses, null,1000,_config.UpdateIntervalMs);
         }
 
         private void UpdateBusses(Object model)

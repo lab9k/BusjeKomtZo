@@ -1,77 +1,91 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.IO;
+using Busje_komt_zo.Classes.Manager;
+using Busje_komt_zo.Interfaces;
 
 namespace Busje_komt_zo.Classes.Model
 {
     public class Bus
     {
-        private BusCoordinates _lastLocation;
-        public int Counter { get; set; }//Counter wil increment if previous location is the same as the current location
+        private readonly IGeoFence _geoFence;
+        private readonly string[] _messages;
+        private readonly PredictionManager _predictionManager;
 
-        
+        public Bus(string[] messages, int id, IGeoFence fence, PredictionManager predictionManager = null)
+        {
+            _predictionManager = predictionManager;
+            _geoFence = fence;
+            _messages = messages;
+            Id = id;
+        }
+
+        public int
+            Counter { get; set; } //Counter wil increment if previous location is the same as the current location
+
+        public int MinutesTillArrival
+        {
+            get
+            {
+                if (_predictionManager != null && Position != null)
+                {
+                    return _predictionManager.GetMinutesTillArival(this);
+                }
+                else
+                {
+                    return -2;
+                }
+            }
+        }
 
         public bool IsAtStop { get; set; }
         public BusStop LastStopVisited { get; set; }
 
         public int Id { get; set; }
 
-        public BusCoordinates Position => _lastLocation;
+        public BusCoordinates Position { get; private set; }
 
         public string Message
         {
             get
             {
                 if (!IsActive())
-                {
-                    return "Inactief";
-                }
-                else if (IsAtStop)
-                {
+                    return _messages[0] + ((LastStopVisited == BusStop.Weba) ? " - PR Weba-Decathlon" : "Sint-Jacobs"); // first message in array
+                if (IsAtStop)
                     if (LastStopVisited == BusStop.Jacob)
                     {
-                        return "Aan Sint-Jacobs";
+                        return _messages[1];
+                        ;
                     }
                     else
                     {
-                        return "Aan P+R Weba-Decathlon";
+                        return _messages[2];
+                        ;
                     }
-                }
-                else
-                {
-                    if (LastStopVisited == BusStop.Weba)
-                    {
-                        return "Onderweg naar Sint-Jacobs";
-                    }
-                    else
-                    {
-                        return "Onderweg naar P+R Weba-Decathlon";
-                    }
-                }
+                if (LastStopVisited == BusStop.Weba)
+                    return _messages[3];
+                return _messages[4]; //last message in array
             }
         }
 
         public bool IsActive()
         {
-            return Counter < 5; //Bus is inactive if counter goes above 5
+            return Counter < 20; //Bus is inactive if counter goes above 20
         }
 
         public void Update(BusCoordinates coords)
         {
             if (coords != null && !coords.Equals(Position))
             {
-                Counter = Counter / 2;
+                Counter = Counter / 4;
 
-                _lastLocation = coords;
-                if (GeoFencing.IsAtWeba(coords.Latitude, coords.Longitude))
+                Position = coords;
+                if (_geoFence.IsAtWeba(coords.Latitude, coords.Longitude))
                 {
                     Console.WriteLine($"{Id} is at Weba");
                     IsAtStop = true;
                     LastStopVisited = BusStop.Weba;
                 }
-                else if (GeoFencing.IsAtJacobs(coords.Latitude, coords.Longitude))
+                else if (_geoFence.IsAtJacobs(coords.Latitude, coords.Longitude))
                 {
                     Console.WriteLine($"{Id} is at Jacob");
                     IsAtStop = true;
@@ -84,11 +98,9 @@ namespace Busje_komt_zo.Classes.Model
             }
             else
             {
-                _lastLocation = coords;
-                Counter = Counter < 10 ? Counter + 1 : Counter;
+                Position = coords;
+                Counter = Counter < 30 ? Counter + 1 : Counter;
             }
         }
-
-
     }
 }

@@ -10,12 +10,15 @@ namespace SessionFetcher
     {
         private readonly string username;
         private readonly string password;
-
-        public SidFetcher()
+        private readonly string chromedriver;
+        private readonly string siteUrl;
+        
+        public SidFetcher(string user, string pw, string chromedriver, string siteUrl)
         {
-            var lines = System.IO.File.ReadAllLines("passwords.txt");
-            username = lines[0];
-            password = lines[1];
+            username = user;
+            password = pw;
+            this.chromedriver = chromedriver;
+            this.siteUrl = siteUrl;
         }
 
         public string GetSid()
@@ -23,11 +26,11 @@ namespace SessionFetcher
             ChromeOptions options = new ChromeOptions();
             options.AddArgument("window-size=1200x600");
             options.AddArgument("headless");
-            IWebDriver driver =
-                new ChromeDriver(@"c:\Users\ruben\Documents\Visual Studio 2017\Projects\Busje_komt_zo\Busje_komt_zo\",
+           IWebDriver driver =
+                new ChromeDriver(chromedriver,
                     options);
             driver.Manage().Timeouts().PageLoad = new TimeSpan(0, 0, 10);
-            driver.Url = "http://nedtrack.nedsoft.nl/";
+            driver.Url = siteUrl;
             driver.Navigate();
 
             Console.WriteLine("Displayed:" + driver.FindElement(By.Id("user")));

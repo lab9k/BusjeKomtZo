@@ -5,7 +5,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Busje_komt_zo.Classes.Model;
 using Busje_komt_zo.Interfaces;
+using Microsoft.Extensions.Options;
 using SessionFetcher;
 
 namespace Busje_komt_zo.Classes.Manager
@@ -19,13 +21,15 @@ namespace Busje_komt_zo.Classes.Manager
         private Timer _timer;
         private SidFetcher _fetcher;
         private bool IsUpdating = false;
+        private string EventsUrl;
 
         public string Sid { get; private set; }
 
-        public SessionManager()
+        public SessionManager(AppConfiguration conf)
         {
             Sid = ReadSidFromFile(_filePath);
-            _fetcher = new SidFetcher();
+            _fetcher = new SidFetcher(conf.Login.User,conf.Login.Password, conf.ChromeDriverLocation, conf.Api.SiteUrl);
+            EventsUrl = conf.Api.Events;
             _timer = new Timer(CheckSession,null,TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(5));
         }
 
@@ -67,21 +71,21 @@ namespace Busje_komt_zo.Classes.Manager
         }
 
 
-        private static async Task<bool> TestSid(string sid)
+        private async Task<bool> TestSid(string sid)
         {
             try
             {
                 var nvc = new List<KeyValuePair<string, string>>();
                 nvc.Add(new KeyValuePair<string, string>("sid", sid));
 
-                var req = new HttpRequestMessage(HttpMethod.Post, @"https://hst-api.wialon.com/avl_evts")
+                var req = new HttpRequestMessage(HttpMethod.Post, EventsUrl)
                 {
                     Content = new FormUrlEncodedContent(nvc)
                 };
                 var client = new HttpClient();
                 HttpResponseMessage res = await client.SendAsync(req);
                 string result = res.Content.ReadAsStringAsync().Result;
-                Console.WriteLine($"Checking sid: {result}");
+                //Console.WriteLine($"Checking sid: {result}");
                 return !result.Contains("error");
             }
             catch (Exception ex)

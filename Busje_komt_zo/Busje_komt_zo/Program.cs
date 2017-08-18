@@ -13,6 +13,7 @@ namespace Busje_komt_zo
                 .UseIISIntegration()
                 .UseStartup<Startup>()
                 .UseApplicationInsights()
+                .UseUrls("http://*:5050")
                 .Build();
             host.Run();
         }
