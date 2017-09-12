@@ -8,7 +8,7 @@
     "Events": "https://hst-api.wialon.com/avl_evts",
     "SiteUrl": "http://nedtrack.nedsoft.nl/"
   },
-  "ChromeDriverLocation": "c:\\Users\\ruben\\Documents\\Visual Studio 2017\\Projects\\Busje_komt_zo\\Busje_komt_zo\\",
+  "ChromeDriverLocation": "location",
   "BusIds": [ 15698388, 15698393, 15698364 ],
   "UpdateIntervalMs": 10000,
   "BusStatusMsgs": [

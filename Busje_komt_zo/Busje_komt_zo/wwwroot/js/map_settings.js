@@ -38,6 +38,7 @@ L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={
 
 
 function GetBusses() {
+    console.log("updating");
     $.ajax(
         {
             dataType: "json",
