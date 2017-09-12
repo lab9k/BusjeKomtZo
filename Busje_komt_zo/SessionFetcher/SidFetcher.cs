@@ -3,6 +3,7 @@ using System.IO;
 using OpenQA.Selenium;
 using Microsoft.Extensions.Configuration;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Firefox;
 
 namespace SessionFetcher
 {
@@ -29,6 +30,7 @@ namespace SessionFetcher
            IWebDriver driver =
                 new ChromeDriver(chromedriver,
                     options);
+
             driver.Manage().Timeouts().PageLoad = new TimeSpan(0, 0, 10);
             driver.Url = siteUrl;
             driver.Navigate();
@@ -40,7 +42,9 @@ namespace SessionFetcher
             driver.FindElement(By.Id("submit")).Click();
             Console.WriteLine(driver.Url);
 
+            System.Threading.Thread.Sleep(5 * 1000);
             String SID = GetItemFromLocalStorage(executor, "wialon_sid");
+            Console.WriteLine("SID:" + SID);
             driver.Quit();
             return SID;
         }

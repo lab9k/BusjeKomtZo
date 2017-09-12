@@ -11,13 +11,18 @@ namespace Busje_komt_zo.Classes.Model
         private readonly string[] _messages;
         private readonly PredictionManager _predictionManager;
 
-        public Bus(string[] messages, int id, IGeoFence fence, PredictionManager predictionManager = null)
+        public Bus(string[] messages, int id, IGeoFence fence, int SequenceNr, string IconUrl, PredictionManager predictionManager = null)
         {
             _predictionManager = predictionManager;
             _geoFence = fence;
             _messages = messages;
             Id = id;
+            SequenceNumber = SequenceNr;
+            this.IconUrl = IconUrl;
         }
+
+        public int SequenceNumber { get; set; }
+        public string IconUrl  { get; set; }
 
         public int
             Counter { get; set; } //Counter wil increment if previous location is the same as the current location
