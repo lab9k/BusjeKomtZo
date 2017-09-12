@@ -11,6 +11,7 @@ namespace Busje_komt_zo.Classes.Model
         public ApiUrls Api { get; set; }
         public string ChromeDriverLocation { get; set; }
         public int[] BusIds { get; set; }
+        public string[] BusIcons { get; set; }
         public int UpdateIntervalMs { get; set; }
         public string[] BusStatusMsgs { get; set; }
         public GeoFence GeoFencing { get; set; }

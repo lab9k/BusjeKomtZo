@@ -29,7 +29,7 @@ namespace Busje_komt_zo.Classes.Manager
             int seqCounter = 1;
             foreach (var id in _config.BusIds)
             {
-                Busses.Add(new Bus(_config.BusStatusMsgs,id, geoFence,seqCounter++, @"https://d30y9cdsu7xlg0.cloudfront.net/png/7892-200.png",_predictionManager));
+                Busses.Add(new Bus(_config.BusStatusMsgs,id, geoFence,seqCounter++, _config.BusIcons[seqCounter-2],_predictionManager));
             }
 
             _timer = new Timer(UpdateBusses, null,1000,_config.UpdateIntervalMs);

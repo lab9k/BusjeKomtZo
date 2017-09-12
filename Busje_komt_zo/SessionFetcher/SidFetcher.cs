@@ -25,8 +25,8 @@ namespace SessionFetcher
         public string GetSid()
         {
             ChromeOptions options = new ChromeOptions();
-            options.AddArgument("window-size=1200x600");
-           // options.AddArgument("headless");
+            //options.AddArgument("window-size=1200x600");
+            options.AddArgument("headless");
            IWebDriver driver =
                 new ChromeDriver(chromedriver,
                     options);

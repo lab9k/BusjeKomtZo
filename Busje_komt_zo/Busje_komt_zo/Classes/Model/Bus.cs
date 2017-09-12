@@ -21,6 +21,19 @@ namespace Busje_komt_zo.Classes.Model
             this.IconUrl = IconUrl;
         }
 
+        public bool IsInRange
+        {
+            get {
+                if (Position != null)
+                {
+                    return _geoFence.IsInRange(Position.Latitude, Position.Longitude);
+                }
+                else
+                {
+                    return false;
+                }}
+        }
+
         public int SequenceNumber { get; set; }
         public string IconUrl  { get; set; }
 

@@ -4,12 +4,14 @@ var busMarkers = [];
 var mymap = L.map("mapid").setView([51.07421875, 3.74382209778], 13);
 
 
-var myIcon = L.icon({
-    iconUrl: "https://d30y9cdsu7xlg0.cloudfront.net/png/7892-200.png",
-    iconSize: [30, 30],
-    iconAnchor: [15, 30],
-    popupAnchor: [-3, -76]
-});
+function getIcon(url) {
+    return L.icon({
+        iconUrl: url,
+        iconSize: [30, 30],
+        iconAnchor: [15, 30],
+        popupAnchor: [-3, -76]
+    });
+}
 
 var weba = L.circle([51.07421875, 3.74382209778],
     {
@@ -65,7 +67,7 @@ function updateMarkers(busses) {
     $.each(busses,
         function (i, item) {
             if (busMarkers.length < busses.length) {
-                busMarkers.push(L.marker([item.position.latitude, item.position.longitude], { icon: myIcon}).addTo(mymap));
+                busMarkers.push(L.marker([item.position.latitude, item.position.longitude], { icon: getIcon(item.iconUrl)}).addTo(mymap));
             } else {
                 var newLatLng = new L.LatLng(item.position.latitude, item.position.longitude);
                 busMarkers[i].setLatLng(newLatLng);
@@ -78,7 +80,7 @@ function updateMarkers(busses) {
             $("#statusTable").find('tbody')
                 .append($('<tr>')
                     .append($('<td>')
-                            .text(item.id)
+                        .text(item.sequenceNumber)
                         )
                     .append($('<td>')
                             .text(item.message)
